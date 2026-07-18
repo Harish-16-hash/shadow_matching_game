@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadow Matching Game - Ultimate Premium Edition</title>
+  <!-- Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%);
+      --card-bg: rgba(255, 255, 255, 0.4);
+      --card-border: rgba(15, 23, 42, 0.08);
+      --accent-primary: #6366f1; /* Indigo */
+      --accent-primary-glow: rgba(99, 102, 241, 0.2);
+      --accent-secondary: #0d9488; /* Teal */
+      --success-color: #059669; /* Green */
+      --success-glow: rgba(5, 150, 105, 0.25);
+      --error-color: #dc2626; /* Red */
+      --error-glow: rgba(220, 38, 38, 0.2);
+      --text-main: #0f172a; /* Slate 900 */
+      --text-muted: #475569; /* Slate 600 */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-main);
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated background elements for premium feel */
+    .bg-glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(255,255,255,0) 70%);
+      filter: blur(40px);
+      z-index: 0;
+      pointer-events: none;
+      animation: float-glow 15s infinite alternate ease-in-out;
+    }
+
+    .bg-glow-2 {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(13, 148, 136, 0.06) 0%, rgba(255,255,255,0) 70%);
+      filter: blur(50px);
+      z-index: 0;
+      pointer-events: none;
+      right: 10%;
+      bottom: 10%;
+      animation: float-glow 20s infinite alternate-reverse ease-in-out;
+    }
+
+    @keyframes float-glow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(50px, 30px) scale(1.2); }
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 40px 30px;
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      z-index: 1;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .game-header {
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4f46e5 0%, #0d9488 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Stats Panel */
+    .stats-panel {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 12px 10px;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(15, 23, 42, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    #score-val {
+      color: var(--accent-secondary);
+    }
+    #streak-val {
+      color: #d97706; /* Darker amber */
+    }
+    #highscore-val {
+      color: #e11d48; /* Darker rose */
+    }
+
+    /* Timer Progress Bar */
+    .timer-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(15, 23, 42, 0.05);
+      border-radius: 3px;
+      margin-bottom: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-secondary), #ef4444);
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+
+    /* Target Object Card */
+    .target-card-wrapper {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 35px auto;
+    }
+
+    .target-card {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(99, 102, 241, 0.06) 0%, rgba(255, 255, 255, 0.6) 100%);
+      border: 2px solid var(--accent-primary);
+      box-shadow: 0 8px 24px var(--accent-primary-glow);
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 80px;
+      user-select: none;
+      position: relative;
+      z-index: 2;
+      animation: pulse-border 2s infinite ease-in-out;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes pulse-border {
+      0% { box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.6); }
+      50% { box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4); border-color: rgba(99, 102, 241, 1); }
+      100% { box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15); border-color: rgba(99, 102, 241, 0.6); }
+    }
+
+    .target-card.correct-anim {
+      animation: success-bounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border-color: var(--success-color);
+      box-shadow: 0 0 35px var(--success-glow);
+    }
+
+    .target-card.wrong-anim {
+      animation: error-shake 0.5s ease-in-out;
+      border-color: var(--error-color);
+      box-shadow: 0 0 35px var(--error-glow);
+    }
+
+    @keyframes success-bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15) rotate(5deg); }
+    }
+
+    @keyframes error-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+
+    /* Options Panel */
+    .options-grid {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+
+    .shadow-option {
+      width: 110px;
+      height: 110px;
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 55px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+    }
+
+    /* Shadow Masking Effect: makes standard colored emojis solid black silhouettes */
+    .shadow-option .emoji-shadow {
+      filter: brightness(0) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+      transition: filter 0.4s ease, transform 0.3s ease;
+      transform: scale(1);
+    }
+
+    .shadow-option:hover {
+      border-color: var(--accent-secondary);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Interactive state styles */
+    .shadow-option.correct {
+      border-color: var(--success-color) !important;
+      background: rgba(5, 150, 105, 0.08) !important;
+      box-shadow: 0 8px 20px var(--success-glow) !important;
+      transform: scale(1.05);
+    }
+    
+    .shadow-option.correct .emoji-shadow {
+      filter: none !important; /* Reveal color on correct choice */
+      transform: scale(1.1);
+    }
+
+    .shadow-option.wrong {
+      border-color: var(--error-color) !important;
+      background: rgba(220, 38, 38, 0.05) !important;
+      box-shadow: 0 8px 20px var(--error-glow) !important;
+      opacity: 0.6;
+    }
+
+    .shadow-option.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Feedback message */
+    .feedback-message {
+      font-size: 1.15rem;
+      font-weight: 600;
+      min-height: 28px;
+      margin-bottom: 25px;
+      transition: all 0.2s ease;
+      letter-spacing: 0.5px;
+    }
+
+    /* Action Buttons */
+    .action-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .btn {
+      font-family: 'Outfit', sans-serif;
+      padding: 14px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, #4f46e5 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.25);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+      background: linear-gradient(135deg, #5850ec 0%, #4338ca 100%);
+    }
+
+    .btn-primary:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.03);
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 0.06);
+      border-color: rgba(15, 23, 42, 0.15);
+    }
+
+    /* Sound settings panel */
+    .settings-bar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      font-size: 16px;
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-main);
+      border-color: rgba(15, 23, 42, 0.15);
+    }
+
+    .icon-btn.active {
+      color: var(--accent-secondary);
+      border-color: var(--accent-secondary);
+      background: rgba(13, 148, 136, 0.06);
+    }
+
+    /* Confetti Canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Score Pulsing effect */
+    .highscore-pulse {
+      animation: highscore-grow 0.5s ease-in-out 2;
+    }
+
+    @keyframes highscore-grow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); color: #fbbf24; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .game-container {
+        padding: 30px 15px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .target-card-wrapper {
+        width: 130px;
+        height: 130px;
+        margin-bottom: 25px;
+      }
+      .target-card {
+        font-size: 65px;
+      }
+      .shadow-option {
+        width: 85px;
+        height: 85px;
+        font-size: 45px;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+  <div class="bg-glow-2"></div>
+  
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="game-container">
+    
+    <!-- Sound and Timer Settings -->
+    <div class="settings-bar">
+      <button class="icon-btn active" id="sound-toggle" title="Toggle Sound" onclick="toggleSound()">
+        🔊
+      </button>
+      <button class="icon-btn active" id="timer-toggle" title="Toggle Timer Mode" onclick="toggleTimerMode()">
+        ⏱️
+      </button>
+    </div>
+
+    <div class="game-header">
+      <h1>Shadow Match</h1>
+      <p class="subtitle">Drag your eyes to identify the shape! Choose the correct matching shadow.</p>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-panel">
+      <div class="stat-card">
+        <div class="stat-label">Score</div>
+        <div class="stat-value" id="score-val">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-value" id="streak-val">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">High Score</div>
+        <div class="stat-value" id="highscore-val">0</div>
+      </div>
+    </div>
+
+    <!-- Timer bar -->
+    <div class="timer-container" id="timer-container">
+      <div class="timer-bar" id="timer-bar"></div>
+    </div>
+
+    <!-- Main Object to Match -->
+    <div class="target-card-wrapper">
+      <div class="target-card" id="target-object">🍎</div>
+    </div>
+
+    <!-- Shadow Options -->
+    <div class="options-grid" id="options-container"></div>
+
+    <!-- Feedback Message -->
+    <div class="feedback-message" id="feedback-msg"></div>
+
+    <!-- Action Buttons -->
+    <div class="action-container">
+      <button class="btn btn-secondary" onclick="resetGame()">Reset</button>
+      <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" disabled>
+        Next Question ➔
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // Pool of fun, colorful emojis
+    const emojiPool = [
+      "🍎", "🚗", "🐶", "🌳", "⭐", "🐟", "✈️", "🍌", 
+      "🐙", "🍕", "🚀", "🦄", "🍦", "🦖", "🎸", "🎈",
+      "🦉", "🍔", "🦁", "🏎️", "🛸", "🍄", "🍍", "💎"
+    ];
+
+    let correctObject = "";
+    let score = 0;
+    let streak = 0;
+    let highscore = parseInt(localStorage.getItem("shadowMatchHighScore")) || 0;
+    let answered = false;
+    let soundEnabled = true;
+    let timerEnabled = true;
+    let timeLeft = 10;
+    let timerInterval = null;
+    const TIME_LIMIT = 10; // seconds
+
+    // Web Audio Synthesizer for retro arcade sound effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'correct') {
+        // Uplifting chime: two rising notes
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, now); // D5
+        osc.frequency.setValueAtTime(880.00, now + 0.1); // A5
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'wrong') {
+        // Flat buzzer
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'click') {
+        // Subtle pop
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + 0.05);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      } else if (type === 'timeout') {
+        // Double low beep
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.setValueAtTime(180, now + 0.12);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      } else if (type === 'highscore') {
+        // High score fanfare
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+        osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+      }
+    }
+
+    // Toggle Sound Settings
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById("sound-toggle");
+      btn.textContent = soundEnabled ? "🔊" : "🔇";
+      btn.classList.toggle("active", soundEnabled);
+      playSound('click');
+    }
+
+    // Toggle Timer Settings
+    function toggleTimerMode() {
+      timerEnabled = !timerEnabled;
+      const btn = document.getElementById("timer-toggle");
+      const container = document.getElementById("timer-container");
+      btn.textContent = timerEnabled ? "⏱️" : "⏳";
+      btn.classList.toggle("active", timerEnabled);
+      container.style.display = timerEnabled ? "block" : "none";
+      playSound('click');
+      
+      if (!timerEnabled) {
+        clearInterval(timerInterval);
+      } else if (!answered) {
+        startTimer();
+      }
+    }
+
+    // Set initial High Score display
+    document.getElementById("highscore-val").textContent = highscore;
+
+    // Timer Logic
+    function startTimer() {
+      if (!timerEnabled) return;
+      clearInterval(timerInterval);
+      timeLeft = TIME_LIMIT;
+      updateTimerUI();
+      
+      timerInterval = setInterval(() => {
+        timeLeft -= 0.1;
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          clearInterval(timerInterval);
+          handleTimeout();
+        }
+        updateTimerUI();
+      }, 100);
+    }
+
+    function updateTimerUI() {
+      const percentage = (timeLeft / TIME_LIMIT) * 100;
+      const bar = document.getElementById("timer-bar");
+      bar.style.width = `${percentage}%`;
+      
+      if (percentage < 30) {
+        bar.style.background = '#ef4444';
+      } else {
+        bar.style.background = 'linear-gradient(90deg, var(--accent-secondary), #8b5cf6)';
+      }
+    }
+
+    function handleTimeout() {
+      if (answered) return;
+      answered = true;
+      
+      playSound('timeout');
+      streak = 0;
+      document.getElementById("streak-val").textContent = streak;
+
+      const target = document.getElementById("target-object");
+      target.classList.add("wrong-anim");
+
+      const feedback = document.getElementById("feedback-msg");
+      feedback.textContent = "Time's up! Try the next question.";
+      feedback.style.color = "var(--error-color)";
+
+      // Highlight correct shadow
+      const options = document.querySelectorAll(".shadow-option");
+      options.forEach(opt => {
+        opt.classList.add("disabled");
+        if (opt.dataset.item === correctObject) {
+          opt.classList.add("correct");
+        }
+      });
+
+      document.getElementById("next-btn").removeAttribute("disabled");
+    }
+
+    // Lightweight Confetti Particle System
+    const canvas = document.getElementById("confetti-canvas");
+    const ctx = canvas.getContext("2d");
+    let confetti = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Confetto {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * -canvas.height - 20;
+        this.size = Math.random() * 8 + 6;
+        this.color = `hsl(${Math.random() * 360}, 95%, 60%)`;
+        this.speedX = Math.random() * 4 - 2;
+        this.speedY = Math.random() * 5 + 4;
+        this.rotation = Math.random() * 360;
+        this.rotationSpeed = Math.random() * 4 - 2;
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        this.rotation += this.rotationSpeed;
+      }
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    function spawnConfetti() {
+      confetti = [];
+      for (let i = 0; i < 80; i++) {
+        confetti.push(new Confetto());
+      }
+    }
+
+    function animateConfetti() {
+      if (confetti.length === 0) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      confetti.forEach((c, index) => {
+        c.update();
+        c.draw();
+        if (c.y > canvas.height) {
+          confetti.splice(index, 1);
+        }
+      });
+      requestAnimationFrame(animateConfetti);
+    }
+
+    // Main Game Loop Functions
+    function nextQuestion() {
+      clearInterval(timerInterval);
+      answered = false;
+      
+      const target = document.getElementById("target-object");
+      const feedback = document.getElementById("feedback-msg");
+      const nextBtn = document.getElementById("next-btn");
+
+      target.classList.remove("correct-anim", "wrong-anim");
+      feedback.textContent = "";
+      nextBtn.setAttribute("disabled", "true");
+
+      // Select target emoji
+      correctObject = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+      target.textContent = correctObject;
+
+      // Select multiple shadows (1 correct, 3 wrong choices)
+      let choices = [correctObject];
+      while (choices.length < 4) {
+        let randomObj = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+        if (!choices.includes(randomObj)) {
+          choices.push(randomObj);
+        }
+      }
+
+      // Shuffle shadows
+      choices.sort(() => Math.random() - 0.5);
+
+      // Render shadows inside container
+      const optionsContainer = document.getElementById("options-container");
+      optionsContainer.innerHTML = "";
+
+      choices.forEach(item => {
+        const option = document.createElement("div");
+        option.className = "shadow-option";
+        option.dataset.item = item;
+        
+        const innerShadow = document.createElement("span");
+        innerShadow.className = "emoji-shadow";
+        innerShadow.textContent = item;
+        
+        option.appendChild(innerShadow);
+        option.onclick = () => checkAnswer(item, option);
+        optionsContainer.appendChild(option);
+      });
+
+      startTimer();
+    }
+
+    function checkAnswer(selected, element) {
+      if (answered) return;
+      answered = true;
+      clearInterval(timerInterval);
+
+      const feedback = document.getElementById("feedback-msg");
+      const target = document.getElementById("target-object");
+      const nextBtn = document.getElementById("next-btn");
+      const options = document.querySelectorAll(".shadow-option");
+
+      options.forEach(opt => opt.classList.add("disabled"));
+
+      if (selected === correctObject) {
+        element.classList.add("correct");
+        target.classList.add("correct-anim");
+        feedback.textContent = "Fantastic! Perfect Match! 🎉";
+        feedback.style.color = "var(--success-color)";
+        
+        score++;
+        streak++;
+        document.getElementById("score-val").textContent = score;
+        document.getElementById("streak-val").textContent = streak;
+
+        playSound('correct');
+        spawnConfetti();
+        animateConfetti();
+
+        // Save High Score
+        if (score > highscore) {
+          highscore = score;
+          localStorage.setItem("shadowMatchHighScore", highscore);
+          const hsVal = document.getElementById("highscore-val");
+          hsVal.textContent = highscore;
+          hsVal.classList.add("highscore-pulse");
+          setTimeout(() => hsVal.classList.remove("highscore-pulse"), 1000);
+          
+          if (score === highscore + 1 || score % 5 === 0) {
+            playSound('highscore');
+          }
+        }
+      } else {
+        element.classList.add("wrong");
+        target.classList.add("wrong-anim");
+        feedback.textContent = "Oops! Try another one next round. 😢";
+        feedback.style.color = "var(--error-color)";
+        
+        streak = 0;
+        document.getElementById("streak-val").textContent = streak;
+
+        playSound('wrong');
+
+        // Reveal the correct option
+        options.forEach(opt => {
+          if (opt.dataset.item === correctObject) {
+            opt.classList.add("correct");
+          }
+        });
+      }
+
+      nextBtn.removeAttribute("disabled");
+    }
+
+    function resetGame() {
+      playSound('click');
+      score = 0;
+      streak = 0;
+      document.getElementById("score-val").textContent = score;
+      document.getElementById("streak-val").textContent = streak;
+      nextQuestion();
+    }
+
+    // Initialize Game on Load
+    nextQuestion();
+  </script>
+</body>
+</html>
